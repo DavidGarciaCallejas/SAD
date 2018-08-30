@@ -1,0 +1,58 @@
+ID;Name;Category;Phylum;Class;Order;Family;M (kg fresh mass);N (indiv/m^3 epilimnion);functional.grouping;trophic.position.grouping;body.mass.grouping;abundance.grouping
+1;Anabaena circinalis;P;Cyanobacteria;Cyanophyceae;Nostocales;Nostocaceae;1.91E-13;6000000;-1;-1;-1;-1
+2;Ankyra judayi;P;Chlorophyta;Chlorophyceae;Chlorococcales;Sphaeropleaceae;1.53E-13;13000000;phytoplankton;basal;light;common
+3;Cryptomonas sp. 1;P;Cryptophyta;Cryptophyceae;Cryptomonadales;Cryptomonadaceae;2.85E-13;33000000;phytoplankton;basal;light;common
+4;Cryptomonas sp. 3;P;Cryptophyta;Cryptophyceae;Cryptomonadales;Cryptomonadaceae;6.72E-13;18000000;phytoplankton;basal;light;common
+5;Cryptomonas sp. 4;P;Cryptophyta;Cryptophyceae;Cryptomonadales;Cryptomonadaceae;1.64E-12;28000000;phytoplankton;basal;light;common
+6;Chroococcus dispersus;P;Cyanobacteria;Cyanophyceae;Chroococcales;Chroococcaceae;2.39E-13;5000000;phytoplankton;basal;light;common
+7;Chroococcus limneticus;P;Cyanobacteria;Cyanophyceae;Chroococcales;Chroococcaceae;1.31E-12;16000000;phytoplankton;basal;light;common
+8;Cosmarium sp.;P;Charophyta;Zygnematophyceae;Zygnematales;Desmidiaceae;3.71E-12;1000000;phytoplankton;basal;light;common
+9;Closteriopsis longissimus;P;Chlorophyta;Chlorophyceae;Sphaeropleales;Ankistrodesmaceae;1.98E-13;1000000;phytoplankton;basal;light;common
+10;Chrysosphaerella longispina;P;Heterokontophyta;Synurophyceae;Synurales;Synuraceae;4.4E-11;1000000;-1;-1;-1;-1
+11;Dinobryon bavaricum;P;Heterokontophyta;Chrysophyceae;Chromulinales;Dinobryaceae;5.29E-12;8000000;phytoplankton;basal;light;common
+12;Dinobryon cylindricum;P;Heterokontophyta;Chrysophyceae;Chromulinales;Dinobryaceae;4.48E-12;67000000;phytoplankton;basal;light;common
+13;Dactylococcopsis fascicularis;P;Cyanobacteria;Cyanophyceae;Chlorococcales;Chroococcaceae;1.32E-13;1000000;phytoplankton;basal;light;common
+14;Diceras sp.;P;Heterokontophyta;Chrysophyceae;Hibberdiales;Stylococcaceae;1.53E-13;1000000;-1;-1;-1;-1
+15;Dictyosphaerium pulchellum;P;Chlorophyta;Chlorophyceae;Chlorococcales;Botryococcaceae;4.07E-13;1000000;phytoplankton;basal;light;common
+16;Dinobryon sertularia;P;Heterokontophyta;Chrysophyceae;Chromulinales;Dinobryaceae;6.28E-12;2000000;phytoplankton;basal;light;common
+17;Sphaerocystis schroeteri;P;Chlorophyta;Chlorophyceae;Tetrasporales;Palmellaceae;1.08E-11;2000000;phytoplankton;basal;light;common
+18;Gloeocystis sp.;P;Chlorophyta;Chlorophyceae;Chlorococcales;Radiococcaceae;9.46E-11;5000000;phytoplankton;basal;light;common
+19;Glenodinium pulvisculus;P;Myzozoa;Dinophyceae;Peridiniales;Peridiniales;5.2E-12;8000000;phytoplankton;basal;light;common
+20;Microcystis aeruginosa;P;Cyanobacteria;Cyanophyceae;Chlorococcales;Microcystaceae;1.62E-11;2000000;phytoplankton;basal;light;common
+21;Mallomonas-spiny sp. 1;P;Heterokontophyta;Synurophyceae;Synurales;Mallomonadaceae;2.22E-12;21000000;-1;-1;-1;-1
+22;Mallomonas-spiny sp. 2;P;Heterokontophyta;Synurophyceae;Synurales;Mallomonadaceae;2.22E-12;26000000;-1;-1;-1;-1
+23;unclassified microflagellates;P;Microflagellate;;;;1.02E-13;126000000;phytoplankton;basal;light;common
+24;Oocystis sp. 1;P;Chlorophyta;Chlorophyceae;Chlorococcales;Oocystaceae;3.86E-12;24000000;phytoplankton;basal;light;common
+25;Oocystis sp. 2;P;Chlorophyta;Chlorophyceae;Chlorococcales;Oocystaceae;6.32E-12;3000000;phytoplankton;basal;light;common
+26;Oscillatoria sp.;P;Cyanobacteria;Cyanophyceae;Oscillatoriales;Oscillatoriaceae;1.61E-12;6000000;phytoplankton;basal;light;common
+27;Peridinium limbatum;P;Myzozoa;Dinophyceae;Peridiniales;Peridiniaceae;6.46E-11;1000000;phytoplankton;basal;light;common
+28;Peridinium pulsillum;P;Myzozoa;Dinophyceae;Peridiniales;Peridiniaceae;1.58E-12;1000000;phytoplankton;basal;light;common
+29;Quadrigula lacustris;P;Chlorophyta;Chlorophyceae;Sphaeropleales;Ankistrodesmaceae;7.13E-12;103000000;phytoplankton;basal;light;common
+30;Quadrigula sp. 2;P;Chlorophyta;Chlorophyceae;Sphaeropleales;Ankistrodesmaceae;9.48E-13;11000000;phytoplankton;basal;light;common
+31;Chromulina sp.;P;Heterokontophyta;Chrysophyceae;Chromulinales;Chromulinaceae;3.03E-14;209000000;phytoplankton;basal;light;common
+32;Schroederia setigera;P;Chlorophyta;Chlorophyceae;Sphaeropleales;Neochloridaceae;6.37E-13;89000000;phytoplankton;basal;light;common
+33;Selenastrum minutum;P;Chlorophyta;Sphaeropleales;Ankistrodesmaceae;Monoraphidium;2.72E-13;11000000;phytoplankton;basal;light;common
+34;Synedra sp.;P;Bacillariophyta;Fragilariophyceae;Fragilariales;Fragilariaceae;3.62E-13;2000000;phytoplankton;basal;light;common
+35;Synura sp.;P;Heterokontophyta;Synurophyceae;Synurales;Mallomonadaceae;5.07E-12;1000000;-1;-1;-1;-1
+36;Ascomorpha eucadis;Z;Rotifera;Monogononta;Ploima;Gastropidae;4E-10;21000;zooplankton;intermediate;light;uncommon
+37;Conochilus (colonial);Z;Rotifera;Monogononta;Flosculariaceae;Conochilidae;1.46E-08;4200;zooplankton;top;standard;uncommon
+38;Conochiloides dossuarius;Z;Rotifera;Monogononta;Flosculariaceae;Conochilidae;1.6E-10;1800;zooplankton;intermediate;light;uncommon
+39;Cyclops varians rubellus;Z;Arthropoda (Crustacea);Maxillopoda (Copepoda);Cyclopoida;Cyclopidae;2.44E-08;2400;zooplankton;intermediate;standard;uncommon
+40;Diaptomus oregonensis;Z;Arthropoda (Crustacea);Maxillopoda (Copepoda);Calanoida;Diaptomidae;1.44E-08;600;zooplankton;intermediate;standard;uncommon
+41;Daphnia pulex;Z;Arthropoda (Crustacea);Branchiopoda;Cladocera;Daphnidae;4.57E-08;15600;zooplankton;intermediate;standard;uncommon
+42;Daphnia rosea;Z;Arthropoda (Crustacea);Branchiopoda;Cladocera;Daphnidae;1.36E-08;2400;zooplankton;intermediate;standard;uncommon
+43;Gastropus hyptopus;Z;Rotifera;Monogononta;Ploima;Gastropidae;1.35E-10;1800;zooplankton;intermediate;light;uncommon
+44;Gastropus stylifer;Z;Rotifera;Monogononta;Ploima;Gastropidae;1E-10;11400;zooplankton;intermediate;light;uncommon
+45;Holopedium gibberum;Z;Arthropoda (Crustacea);Branchiopoda;Cladocera;Holopedidae;4.89E-08;4200;zooplankton;intermediate;standard;uncommon
+46;Kellicottia bostoniensis;Z;Rotifera;Monogononta;Ploima;Brachionidae;2E-11;31800;zooplankton;intermediate;light;uncommon
+47;Kellicottia longispina;Z;Rotifera;Monogononta;Ploima;Brachionidae;4.5E-11;3000;zooplankton;intermediate;light;uncommon
+48;Keratella cochlearis;Z;Rotifera;Monogononta;Ploima;Brachionidae;1E-11;52800;zooplankton;intermediate;light;uncommon
+49;Keratella testudo;Z;Rotifera;Monogononta;Ploima;Brachionidae;1.5E-11;69600;zooplankton;intermediate;light;uncommon
+50;Orthocyclops modestus;Z;Arthropoda (Crustacea);Maxillopoda (Copepoda);Cyclopoida;Cyclopidae;3.22E-08;600;zooplankton;intermediate;standard;uncommon
+51;Polyarthra vulgaris;Z;Rotifera;Monogononta;Ploima;Synchaetatidae;2.6E-10;75600;zooplankton;intermediate;light;uncommon
+52;Synchaeta sp.;Z;Rotifera;Monogononta;Ploima;Synchaetatidae;3.7E-10;29400;zooplankton;intermediate;light;uncommon
+53;Trichocerca cylindrica;Z;Rotifera;Monogononta;Ploima;Trichocercidae;5.9E-10;22200;zooplankton;intermediate;light;uncommon
+54;Trichocerca multicrinis;Z;Rotifera;Monogononta;Ploima;Trichocercidae;7E-11;4200;zooplankton;intermediate;light;uncommon
+55;Tropocyclops prasinus;Z;Arthropoda (Crustacea);Maxillopoda (Copepoda);Cyclopoida;Cyclopidae;0.000000009;1200;zooplankton;intermediate;standard;uncommon
+56;Chaoborus punctipennis;Z;Arthropoda;Insecta;Diptera;Chaoboridae;0.00000021;12000;zooplankton;intermediate;standard;uncommon
+57;Micropterus salmoides;F;Chordata;Actinopterygii;Perciformes;Centrarchidae;0.2;0.03;fish;top;heavy;rare
