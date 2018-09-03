@@ -161,7 +161,7 @@ for(i.vul in 1:length(vulnerability.levels)){
         my.size <- ifelse(my.size==0,1,my.size)
         
         # same vulnerability (degree) for all species?
-        # if not, generate random samples from a normal distribution and sort
+        # if not, generate random samples from a truncated poisson distribution and sort
         # by abundances
         if(constant.vulnerability){
           prey.tl$V <- rep(my.size,nrow(prey.tl))
