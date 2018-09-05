@@ -1,15 +1,54 @@
-
 # theoretical distributions of abundances in increasing trophic levels
 # given body sizes of all levels, and abundances of the basal level
 
 #####################
-#####################
 # auxiliary functions
 
+# niche model version from Kleka 2014 plos one
+NicheModelv2<-function(S,C,mass.range){ # S = the number of species, C = target connectance, mass.range = the range of body masses in the food web (w_max/w_min)
+  
+  C.web=2 # C.web = actual connectance, set C.web to a nonsensical value to initiate the while loop
+  
+  while((C.web>1.03*C)|(C.web<0.97*C)){ # C.web should be +- 3% of the target value of C
+    
+    con<-rep(0,times=S) # vector containing 0 for disconnected species
+    
+    while(length(con[con==0])>0){ # while some elements of con are zero, generate a new web until there are no disconnected species
+      
+      beta<-(1-2*C)/(2*C)
+      species.niche<-sort(runif(n=S,min=0,max=1)) # generate niche values
+      
+      body.masses<-10^(mass.range*species.niche) # calculate body masses from niche values
+      
+      species.ri<-c(1-(1-runif(S))^(1/beta))*species.niche
+      species.ri[1]<-0 #the smallest species is always a primary producer, it has zero niche width
+      
+      for (n in 1:S){
+        while (species.ri[n]/2>species.niche[n]) {species.ri[n]<-(1-(1-runif(1))^(1/beta))} # species r_i has to satisfy this condition
+      }
+      
+      species.centre<-sapply(1:S,function (x) runif(1,min=species.ri[x]/2,max=species.niche[x])) # the centre of the feeding niche
+      
+      web<-matrix(0,nrow=S,ncol=S) # initiate the food web matrix
+      
+      for (j in 1:S){
+        for (i in 1:S){
+          if ((species.niche[i]<(species.centre[j]+species.ri[j]/2)) & (species.niche[i]>(species.centre[j]-species.ri[j]/2))) {web[i,j]<-1}
+          # fill in the food web matrix
+        }
+      }
+      
+      web.zero.diagonal<-web*(matrix(1,nrow=S,ncol=S)-diag(S)) # set all values on the diagonal to zero, so that purely cannibalistic species are counted as disconnected
+      con<-colSums(web.zero.diagonal)+rowSums(web.zero.diagonal) # disconnected species have a value of con=0
+    }
+    C.web=sum(web)/S^2
+  }
+  
+  return(list("model"=c("original niche model"),"body.masses"=body.masses,"web"=web,"S"=S,"C"=C,"mass.range"=mass.range))
+}
+
 #####################
-# the niche model for food web structure
-
-
+# the niche model, own version
 NicheModel <- function(S,connectance,niche = NULL){
   
   interaction.matrix <- matrix(0,nrow=S,ncol=S)
@@ -51,297 +90,277 @@ NicheModel <- function(S,connectance,niche = NULL){
   } 
 }
 
-connectance <- 0.2
-S <- 10
+#####################
+# network parameters
+connectance.levels <- c(0.1,0.2,0.5)
+richness.levels <- c(50,100,200)
+
+# basal abundances distribution
 shape.weibull.min <- 0.15
 shape.weibull.max <- 0.2
 scale.weibull <- 4.7 * 100
 
-tt <- NicheModel(S,connectance)
-interaction.matrix <- tt[[1]]
-niche <- tt[[2]]
+# other parameters
+# Lindeman's ten percent law
+# trebilco et al. 2013
+conversion.efficiency.min <- 0.1
+conversion.efficiency.max <- 0.15
 
-abundances <- data.frame(ID = 1:S,M = niche,abundance = 0)
+# simulations
+replicates <- 1000
 
-basal <- which(colSums(interaction.matrix) == 0)
-abundances$abundance[basal] <- rweibull(length(basal),
-                                        shape = runif(1,shape.weibull.min,shape.weibull.max),
-                                        scale = scale.weibull)
-
-for(i.basal in 1:length(basal)){
-  # predator.set <- which(interaction.matrix[i.basal,] == 1)
-  predator.set <- data.frame(predator.id = which(interaction.matrix[i.basal,] == 1), specialization = 0)
-  if(nrow(predator.set)>1){
-    # resource is partitioned according to the degree of specialization
-    # and this is given by the number of links of the predators
-    for(i.predator in 1:nrow(predator.set)){
-      predator.set$specialization[i.predator] <- sum(interaction.matrix[,predator.set$predator.id[i.predator]] == 1)
-    }# for each predator
-    
-    resource.available <- abundances$M[i.basal] * abundances$abundance[i.basal]
-    # dominance preemption, sugihara 1980, tokeshi 1990
-    resource.partition <- nicheApport::dominancePreemp(resource.available,nrow(predator.set))
-    # if i ever use dominance decay, beware that it fails for n=2
-    predator.set <- arrange(predator.set,specialization)
-    predator.set$assigned <- resource.partition
-    
-    abundances$abundance[abundances$ID %in% predator.set$predator.id] 
-    
-    # # those with assigned resources
-    # predator.set$assigned <- FALSE
-    # # how much of the resource still available
-    # available.resource <- 1
-    # # there are (predator-1) breaks
-    # for(i.break in 1:(length(predator.set)-1)){
-    #   
-    #   # dominant species will take the biggest slice
-    #   dominant <- predator.set$predator.id[predator.set$specialization == min(predator.set$specialization) & predator.set$assigned == FALSE]
-    #   
-    #   # if there are two or more equally dominant, randomize
-    #   if(length(dominant)>1){
-    #     dominant <- sample(dominant,1)
-    #   }
-    #   
-    #   resource <- abundances$M[i.basal] * abundances$abundance[i.basal] * resource.available
-    #   
-    #   dominant.proportion <- runif(1,0.5,0.99)
-    #   
-    #   # which break is to be split after this break? 
-    #   # 1 is the dominant
-    #   my.break <- sample(1:2,1)
-    #   
-    #   # if the dominant piece is to be split after this break, 
-    #   if(my.break == 1){
-    #     
-    #   }else{
-    #     abundances$abundance[abundances$ID == dominant] <- abundances$abundance[abundances$ID == dominant] + dominant.proportion*resource
-    #   }
-    #   
-    #   
-    #   
-    # }
-      
-  }else if(nrow(predator.set) == 1){
-    abundances$abundance[abundances$ID == predator.set] <- abundances$abundance[i.basal]
-  }else if(length(predator.set) == 0){
-    # no predators, so nothing to do
-  }
-  
-}# for i.basal
-
-#####################
-# this function generates samples from a truncated poisson distribution
-# N = number of samples
-# lambda = poisson rate parameter
-# k = lower limit (right-truncated)
-
-rtpois <- function(N, lambda, k) qpois(runif(N, ppois(k, lambda), 1), lambda)
-
-#####################
-#####################
-# simulations for obtaining SADs based on Cohen's formula
-# communities with:
-# 4 trophic levels
-# varying degrees of (1) vulnerability and (2) body mass-trophic level relationships
-
-# qualitatively similar to fig. 1 of turney and buddle 2016
-richness <- 100
-richness.tl.proportion <- c(.35,.25,.25,.15)
-
-# body size levels
-# see Riede et al. (2011)
-# 1 - body mass increases with trophic level
-# 2 - predator-prey mass ratio generally decreases with trophic level
-# such that body size of predators and their prey are more similar up in the food chain
-
-# if p = predator/prey mass ratio,
-# log(p,10) = a + b*trophic.level
-# b is the slope of the relationship.
-# calculate b from table 2 of Riede et al (2011)
-mass.ratio.exponent <- mean(c(-0.82,-0.89,-0.87,-0.49,-0.62,-0.71,-1.5,-0.39,-0.49,0.56))
-# the exact form will be calculated at each timestep, given stochastic values of the intercept
-# body size of basal trophic level
-basal.mass <- 1
-
-# how many replicates of each configuration
-replicates <- 100
-
-# vulnerability levels
-# min: one predator per prey
-# max: all predators prey upon all preys
-# in between, there are three levels, with various percentages of vulnerability
-# these three percentages are given by "vulnerability.connectances"
-vulnerability.levels <- c("min","low","intermediate","high","max")
-vulnerability.connectances <- c(0.1,0.2,0.5)
-
-# vulnerability, constant for the whole trophic level or varying degree, depending on abundance?
-constant.vulnerability <- FALSE
-
-# in this version, only increasing body size, following Riede et al. (2011)
-bodysize.tl.levels <- c("increasing")
-
-# which distribution for generating basal abundances?
-basal.dist <- "weibull"
-
-# these parameters are taken from "SAD_cohen_fit_basal_dist.R"
-# with the additional point that I multiplied the scale parameter by an arbitrary value
-# in order to get maximum basal abundances on the range of 10^3
-shape.weibull.min <- 0.15
-shape.weibull.max <- 0.2
-scale.weibull <- 4.7 * 100
-
-# if using exponential distribution...
-# rate of the exponential distribution for generating basal abundances
-exp.rate <- 0.005
-
-#####################
-#####################
-
+#######################
 sim.results <- NULL
 
-i.vul <- 2
-i.size <- 1
-i.rep <- 1
+# 
+# i.richness <- 1
+# i.connectance <- 1
+# i.replicate <- 1
 
-for(i.vul in 1:length(vulnerability.levels)){
-  for(i.size in 1:length(bodysize.tl.levels)){
-    
-    for(i.rep in 1:replicates){
+for(i.richness in 1:length(richness.levels)){
+  for(i.connectance in 1:length(connectance.levels)){
+    for(i.replicate in 1:replicates){
       
-      # this is arbitrary
-      mass.ratio.intercept <- runif(1,5,10)
+      # results dataframe
+      sp.data <- data.frame(richness = richness.levels[i.richness],
+                            connectance = connectance.levels[i.connectance],
+                            replicate = i.replicate,
+                            ID = 1:richness.levels[i.richness],
+                            trophic.position = 0,
+                            trophic.guild = "-",
+                            M = 0,
+                            N_predicted = 0,
+                            # auxiliary
+                            complete = FALSE)
       
-      # calculate body mass of higher trophic levels
-      size.cat <- c(basal.mass,0,0,0)
-      for(i.tl in 2:4){
-        my.ratio <- mass.ratio.intercept * i.tl^mass.ratio.exponent
-        my.cat <- size.cat[i.tl-1]*my.ratio
-        size.cat[i.tl] <- my.cat
+      # niche axis
+      my.niche <- sort(runif(richness.levels[i.richness],0,1))
+      # generate network with the niche model
+      interaction.matrix <- NicheModel(richness.levels[i.richness],connectance.levels[i.connectance],my.niche)
+      
+      # body sizes - check
+      sp.data$M <- my.niche
+      
+      # do not allow closed loops, for example sp1 feeding on sp2 and sp2 feeding on sp1
+      # randomly remove one of the links
+      # longer loops are removed below
+      for(i.sp in 1:nrow(sp.data)){
+        for(j.sp in 1:nrow(sp.data)){
+          if(interaction.matrix[i.sp,j.sp] == 1 & interaction.matrix[j.sp,i.sp] == 1){
+            to.remove <- sample(1:2,1)
+            if(to.remove == 1){
+              interaction.matrix[i.sp,j.sp] <- 0
+            }else{
+              interaction.matrix[j.sp,i.sp] <- 0
+            }
+          }
+        }
       }
       
+      basal <- which(colSums(interaction.matrix) == 0)
+      # check this part
+      sp.data$N_predicted[basal] <- rweibull(length(basal),
+                                              shape = runif(1,shape.weibull.min,shape.weibull.max),
+                                              scale = scale.weibull)
+      # for now!
+      # sp.data$N_predicted[sp.data$N_predicted < 1] <- 1
       
-      # species info
-      sp.data <- data.frame(vulnerability.level = vulnerability.levels[i.vul],
-                            body.size.tl = bodysize.tl.levels[i.size],
-                            replicate = i.rep,
-                            ID = 1:richness,trophic.level = c(rep(1,richness * richness.tl.proportion[1]),
-                                                              rep(2,richness * richness.tl.proportion[2]),
-                                                              rep(3,richness * richness.tl.proportion[3]),
-                                                              rep(4,richness * richness.tl.proportion[4])),M = 0, V = 0, N_predicted = 0)
-      # body mass - trophic level relationship
-      # allowing some variability (0.1*mean)
-      sp.data$M[sp.data$trophic.level == 1] <- rnorm(nrow(sp.data[sp.data$trophic.level == 1,]),size.cat[1],size.cat[1]*.1)
-      sp.data$M[sp.data$trophic.level == 2] <- rnorm(nrow(sp.data[sp.data$trophic.level == 2,]),size.cat[2],size.cat[2]*.1)
-      sp.data$M[sp.data$trophic.level == 3] <- rnorm(nrow(sp.data[sp.data$trophic.level == 3,]),size.cat[3],size.cat[3]*.1)
-      sp.data$M[sp.data$trophic.level == 4] <- rnorm(nrow(sp.data[sp.data$trophic.level == 4,]),size.cat[4],size.cat[4]*.1)    
-      
-      # abundance of the basal trophic level
-      if(basal.dist == "weibull"){
-        sp.data$N_predicted[sp.data$trophic.level == 1] <- rweibull(nrow(sp.data[sp.data$trophic.level == 1,]),
-                                                                    shape = runif(1,shape.weibull.min,shape.weibull.max),
-                                                                    scale = scale.weibull)
-      }else if(basal.dist == "exp"){
-        sp.data$N_predicted[sp.data$trophic.level == 1] <- rexp(nrow(sp.data[sp.data$trophic.level == 1,]),exp.rate)
-      }
-      
-      # generate links according to the vulnerability level
-      interaction.matrix <- matrix(0,nrow = richness,ncol = richness)
-      
-      # basal level does not have prey
-      for(i.tl in 2:4){
-        prey.tl <- subset(sp.data,trophic.level == i.tl-1)
+      ##################
+      # generate predicted abundances
+      # first, propagate from basal species
+      for(i.basal in 1:length(basal)){
         
-        # species in the upper tl/ or, in general, in a higher tl if omnivory!!
-        # predator.set <- sp.data$ID[sp.data$trophic.level == (i.tl)]
-        predator.set <- sp.data$ID[sp.data$trophic.level > i.tl]
-        
-        # average number of links
-        if(vulnerability.levels[i.vul] == "min"){
-          my.size <- 1
-        }else if(vulnerability.levels[i.vul] == "low"){
-          my.size <- round(length(predator.set) * vulnerability.connectances[1])
-        }else if(vulnerability.levels[i.vul] == "intermediate"){
-          my.size <- round(length(predator.set) * vulnerability.connectances[2])
-        }else if(vulnerability.levels[i.vul] == "high"){
-          my.size <- round(length(predator.set) * vulnerability.connectances[3])
-        }else{
-          my.size <- length(predator.set)
-        }
-        # in case it is rounded to 0
-        my.size <- ifelse(my.size==0,1,my.size)
-        
-        # same vulnerability (degree) for all species?
-        # if not, generate random samples from a truncated poisson distribution and sort
-        # by abundances
-        if(constant.vulnerability){
-          prey.tl$V <- rep(my.size,nrow(prey.tl))
-        }else{
-          prey.tl.links <- rtpois(N = nrow(prey.tl),lambda = my.size,k = 0)
-          prey.tl.links[prey.tl.links > length(predator.set)] <- length(predator.set)
-          prey.tl <- arrange(prey.tl,desc(N_predicted))
-          prey.tl$V <- sort(prey.tl.links,decreasing = TRUE)
+        # if the basal sp has predators
+        if(sum(interaction.matrix[basal[i.basal],])>0){
           
-          prey.tl <- arrange(prey.tl,ID)
-        }
-        
-        # now, fill the interactions of each species
-        for(i.sp in 1:nrow(prey.tl)){
-          
-          if(length(predator.set)>1){
-            unconnected.predators <- predator.set[which(colSums(interaction.matrix[,predator.set]) >= 0)]
-          }else{
-            unconnected.predators <- ifelse(sum(interaction.matrix[,predator.set])<1,predator.set,0)
-          }
-          
-          # if number of links is less than the number of unconnected predators, link them
-          # otherwise, choose from the overall predator pool.
-          # don't bother too much.
-          if(prey.tl$V[i.sp] <= length(unconnected.predators)){
-            my.predator <- sample.vec(x = unconnected.predators,size = prey.tl$V[i.sp],replace=F)
-          }else{
-            my.predator <- sample.vec(x = predator.set,size = prey.tl$V[i.sp],replace=F)
-          }
-          
-          interaction.matrix[i.sp,my.predator] <- -1
-          interaction.matrix[my.predator,i.sp] <- 1
-          
-          sp.data$V[sp.data$ID == prey.tl$ID[i.sp]] <- prey.tl$V[i.sp]
-          
-        }# for each species
-        
-        # calculate niche apportionment and abundances of this trophic level
-        # sugihara 1980 is the main reference.
-        
-        for(i.sp in 1:nrow(sp.data)){
-          if(sp.data$trophic.level[i.sp] == i.tl){
-            # compute expected abundances...
-            # prey species
-            prey.sp <- which(interaction.matrix[,i.sp] == -1)
-            if(length(prey.sp) != 0){
-              prey.data <- sp.data[sp.data$ID %in% prey.sp,]
-              sp.data$N_predicted[i.sp] <- CohenAbundance(species.mass = sp.data$M[i.sp],prey.data = prey.data,type = "N")
-            }# if-else prey
+          resource.available <- sp.data$M[basal[i.basal]] * sp.data$N_predicted[basal[i.basal]] * runif(1,conversion.efficiency.min,conversion.efficiency.max)
+          predator.set <- data.frame(predator.id = which(interaction.matrix[basal[i.basal],] == 1), specialization = 0)
+          if(nrow(predator.set)>1){
+            # resource is partitioned according to the degree of specialization
+            # and this is given by the number of links of the predators
+            for(i.predator in 1:nrow(predator.set)){
+              predator.set$specialization[i.predator] <- sum(interaction.matrix[,predator.set$predator.id[i.predator]] == 1)
+            }# for each predator
             
-          }# if my trophic level
-        }# for i.sp
+            # the more specialized predators are the best competitors
+            predator.set <- arrange(predator.set,specialization)
+            equal.specialization <- predator.set$predator.id[which(predator.set$specialization %in% predator.set$specialization[which(duplicated(predator.set$specialization))])]
+            predator.order <- predator.set$predator.id
+            if(length(equal.specialization)>0){
+              equal.order <- which(predator.order %in% equal.specialization)
+              new.order <- sample(equal.order)
+              predator.order[equal.order] <- predator.order[new.order]
+            }
+            
+            # dominance preemption, sugihara 1980, tokeshi 1990
+            resource.partition <- nicheApport::dominancePreemp(resource.available,nrow(predator.set))
+            # if i ever use dominance decay, beware that it fails for n=2
+            # predator.set <- arrange(predator.set,specialization)
+            # predator.set$assigned <- resource.partition
+            
+            sp.data$N_predicted[sp.data$ID %in% predator.order] <- sp.data$N_predicted[sp.data$ID %in% predator.order] + 
+              resource.partition
+          }else if(nrow(predator.set) == 1){
+            sp.data$N_predicted[sp.data$ID == predator.set] <- resource.available
+          }#else if(nrow(predator.set) == 0){
+          # no predators, so nothing to do
+          #}
+        }# if it has predators  
         
-      }# for each trophic level
+        sp.data$complete[basal[i.basal]] <- TRUE
+      }# for i.basal
+      
+      # second, loop through the rest of species, propagating the biomass flows
+      # and substituting interactions if a loop is found
+      while(!all(sp.data$complete)){
+        
+        current.complete <- sum(sp.data$complete)
+        # after basal species, all species that only feed on basal ones should be complete
+        for(i.sp in 1:nrow(sp.data)){
+          
+          if(sp.data$complete[i.sp] == FALSE){
+            
+            prey.set <- which(interaction.matrix[,i.sp] == 1)
+            if(length(prey.set)>0){
+              complete.sp.match <- match(prey.set,sp.data$ID[sp.data$complete == TRUE])
+              # if all preys are complete, 
+              # this sp is also complete and can "propagate" up in the network
+              if(!anyNA(complete.sp.match)){
+                sp.data$complete[i.sp] <- TRUE
+                remaining <- sum(sp.data$complete == F)
+                # print(paste("sp:",i.sp," complete, ", remaining, " remaining", sep=""))
+                # propagate its abundance, but only if it has predators
+                if(sum(interaction.matrix[i.sp,])>0){
+                  
+                  resource.available <- sp.data$M[i.sp] * sp.data$N_predicted[i.sp] * runif(1,conversion.efficiency.min,conversion.efficiency.max)
+                  predator.set <- data.frame(predator.id = which(interaction.matrix[i.sp,] == 1), specialization = 0)
+                  if(nrow(predator.set)>1){
+                    # resource is partitioned according to the degree of specialization
+                    # and this is given by the number of links of the predators
+                    for(i.predator in 1:nrow(predator.set)){
+                      predator.set$specialization[i.predator] <- sum(interaction.matrix[,predator.set$predator.id[i.predator]] == 1)
+                    }# for each predator
+                    
+                    # dominance preemption, sugihara 1980, tokeshi 1990
+                    resource.partition <- nicheApport::dominancePreemp(resource.available,nrow(predator.set))
+                    # if i ever use dominance decay, beware that it fails for n=2
+                    # predator.set <- arrange(predator.set,specialization)
+                    # predator.set$assigned <- resource.partition
+                    
+                    sp.data$N_predicted[sp.data$ID %in% predator.set$predator.id] <- sp.data$N_predicted[sp.data$ID %in% predator.set$predator.id] + 
+                      resource.partition
+                  }else if(nrow(predator.set) == 1){
+                    sp.data$N_predicted[sp.data$ID == predator.set$predator.id] <- sp.data$N_predicted[sp.data$ID == predator.set$predator.id] + 
+                      resource.available
+                  }
+                }# does it have predators?
+              }# if any NA
+            }# if predator
+            
+          } # if not complete
+        }# for each sp
+        after.complete <- sum(sp.data$complete)
+        
+        # are there loops without primary producers?
+        # this happens if not all species are "complete"
+        # in two succesive rounds
+        # if this is the case, try to "break" the loop
+        # by removing an interaction and reassigning it to a primary producer-consumer interaction
+        if(after.complete == current.complete){
+          # print(paste("entering reassigning phase..."))
+          incomplete.sp <- sp.data[sp.data$complete == FALSE,]
+          
+          initial.sp <- incomplete.sp$ID[1]  
+          my.prey <- which(interaction.matrix[,initial.sp] == 1)
+          incomplete.prey <- sp.data$ID[sp.data$ID %in% my.prey & sp.data$complete == FALSE]
+          loop.sp <- c(initial.sp)
+          
+          while(anyDuplicated(loop.sp) == 0){
+            loop.sp <- c(loop.sp,incomplete.prey[1])
+            my.sp <- incomplete.prey[1]
+            my.prey <- which(interaction.matrix[,my.sp] == 1)
+            incomplete.prey <- sp.data$ID[sp.data$ID %in% my.prey & sp.data$complete == FALSE]
+          }
+          
+          selected.consumer <- sample.vec(loop.sp,1)#loop.sp[anyDuplicated(loop.sp)]
+          
+          # in order to increase artificially the number of herbivores, 
+          # substitute all the links of the selected sp for basal-herbivore links
+          # this may alter the structural patterns of the niche model, check below
+          
+          num.links <- sum(interaction.matrix[,selected.consumer])
+          # use the vector "basal" from a few lines above
+          interaction.matrix[,selected.consumer] <- 0
+          num.links <- ifelse(num.links>length(basal),length(basal),num.links)
+          
+          new.resources <- sample.vec(basal,num.links)
+          
+          interaction.matrix[new.resources,selected.consumer] <- 1
+          
+          # alternatively, substitute only one link
+          # selected.resource <- which(interaction.matrix[,selected.consumer] == 1)
+          # selected.resource <- sp.data$ID[sp.data$ID %in% selected.resource & sp.data$complete == FALSE]
+          # selected.resource <- sample.vec(selected.resource,1)
+          # 
+          # interaction.matrix[selected.resource,selected.consumer] <- 0
+          # 
+          # # substitute the removed link with a new link from a basal resource
+          # new.resource <- which(colSums(interaction.matrix) == 0)
+          # new.resource <- new.resource[which(interaction.matrix[new.resource,selected.consumer] == 0)]
+          # new.resource <- sample.vec(new.resource,1)
+          # 
+          # interaction.matrix[new.resource,selected.consumer] <- 1
+        }
+        
+      }# while species not completed
+      
+      ###########################
+      # trophic level assignment
+      cheddar.dataframe <- sp.data
+      names(cheddar.dataframe)[which(names(cheddar.dataframe) == "ID")] <- "node"
+      cheddar.dataframe <- cheddar.dataframe[,c("node","M")]
+      cheddar.dataframe$node <- as.character(cheddar.dataframe$node)
+      cheddar.dataframe$node <- paste("sp",cheddar.dataframe$node,sep="")
+      cheddar.links <- expand.grid(1:nrow(sp.data),1:nrow(sp.data))
+      names(cheddar.links)[1] <- "resource"
+      names(cheddar.links)[2] <- "consumer"
+      cheddar.links$maintain <- TRUE
+      for(i.link in 1:nrow(cheddar.links)){
+        if(interaction.matrix[cheddar.links$resource[i.link],cheddar.links$consumer[i.link]] == 0){
+          cheddar.links$maintain[i.link] <- FALSE
+        }
+      }
+      cheddar.links <- subset(cheddar.links,maintain == TRUE)
+      cheddar.links <- cheddar.links[,1:2]
+      cheddar.links$resource <- paste("sp",cheddar.links$resource,sep="")
+      cheddar.links$consumer <- paste("sp",cheddar.links$consumer,sep="")
+      
+      cheddar.community <- Community(cheddar.dataframe,properties = list(title="foo",M.units="arbitrary"),trophic.links = cheddar.links)
+      trophic.levels.community <- PreyAveragedTrophicLevel(cheddar.community,include.isolated = F)
+      sp.data$trophic.position <- trophic.levels.community
+      
+      # hist(sp.data$trophic.position,breaks = 100)
+      
+      #Williams and Martinez 2008 have these categories
+      sp.data$trophic.guild <- "Omnivores"
+      sp.data$trophic.guild[sp.data$trophic.position == 1] <- "Primary Producers"
+      sp.data$trophic.guild[sp.data$trophic.position >= 2 & sp.data$trophic.position < 2.3] <- "Herbivores"
+      sp.data$trophic.guild[sp.data$trophic.position > 2.7 & sp.data$trophic.position < 3.3] <- "Carnivores"
+      sp.data$trophic.guild[sp.data$trophic.position > 3.7 & sp.data$trophic.position < 4.3] <- "Carnivores"
+      sp.data$trophic.guild[sp.data$trophic.position > 4.7 & sp.data$trophic.position < 5.3] <- "Carnivores"
+      sp.data$trophic.guild[sp.data$trophic.position > 5.7 & sp.data$trophic.position < 6.3] <- "Carnivores"
+      sp.data$trophic.guild[sp.data$trophic.position > 6.7 & sp.data$trophic.position < 7.3] <- "Carnivores"
+      
+      # table(sp.data$trophic.guild)
       
       # store results
       sim.results <- rbind(sim.results,sp.data)
       
-    }# for i.rep
-  }# for i.size
-}# for i.vul
+    }# for i.replicate
+    
+    print(paste(date()," - niche model simulation -- richness: ", richness.levels[i.richness], ", connectance: ", connectance.levels[i.connectance], ", ",replicates," replicates completed",sep=""))
+    
+  }# for i.connectance
+}# for i.richness
 
-if(constant.vulnerability){
-  readr::write_delim(x = sim.results,path = "./results/cohen_simulation_abundances_CONSTANT_DEGREE.csv",delim = ";")
-}else{
-  readr::write_delim(x = sim.results,path = "./results/cohen_simulation_abundances_VARIABLE_DEGREE.csv",delim = ";")
-}
-
-
-
-
-
-
+readr::write_delim(x = sim.results,path = "./results/abundances_niche_model.csv",delim = ";")

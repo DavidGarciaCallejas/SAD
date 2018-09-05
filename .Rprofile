@@ -1,4 +1,6 @@
 cat("Species abundance distributions and trophic guilds. Packages and functions loaded:\n")
+# theoretical model
+require(cheddar)
 # data analysis and metrics
 require(tidyverse)
 require(readr)
