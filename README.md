@@ -24,21 +24,21 @@ These will classify all mammal species into trophic guilds, and will generate a 
 
 ## 2 - Theoretical model ##
 
-Cohen's et al (2003) model is coded and evaluated through several scripts:
+The theoretical model is coded and evaluated through several scripts:
 
-The first two generate predicted abundances and evaluate their goodness of fit for the tuesday lake dataset (also included in /data/abundance datasets):
+The first script generates model food webs and calculates the abundances of its species with a number of parameters and apportionment models:
 
-#### SAD_cohen_tuesday_lake_predicted ####
-#### SAD_cohen_tuesday_lake_fit ####
+#### SAD_sugihara_abundances_model ####
 
-Then, the model itself is
+Script for assigning a trophic guild to the species of the food web:
 
-#### SAD_cohen_abundances_model ####
+#### SAD_sugihara_trophic_guilds ####
 
-Scripts for evaluating and printing the results are
+Scripts for evaluating and printing the results:
 
-#### SAD_cohen_model_results ####
-#### SAD_cohen_model_plots ####
+#### SAD_sugihara_model_results ####
+#### SAD_sugihara_metrics_regression ####
+#### SAD_sugihara_model_plots ####
 
 ## 3 - Empirical datasets ##
 
