@@ -1,8 +1,8 @@
 #####################
-# calculate hill evenness, mad, skewness for every SAD obtained with the script "SAD_cohen_abundances_model"
+# calculate hill evenness, mad, skewness for every SAD obtained with the script "SAD_sugihara_abundances_model"
 #####################
 
-model.data <- readr::read_delim(file = "./results/abundances_niche_model.csv",delim = ";")
+model.data <- readr::read_delim(file = "./results/abundances_niche_model_trophic_guild.csv",delim = ";")
 
 richness.levels <- unique(model.data$richness)
 connectance.levels <- unique(model.data$connectance)
@@ -12,17 +12,12 @@ replicates <- max(model.data$replicate)
 
 # guild.abundances <- model.data %>% group_by(richness,connectance,trophic.guild,replicate) %>% summarise(abund = n())
 # mean.abundances <- guild.abundances %>% group_by(richness,connectance,trophic.guild) %>% summarise(mean.abund = mean(abund))
-# ggplot(guild.abundances) + 
-#   geom_boxplot(aes(x = trophic.guild, y = abund)) + 
-#   facet_grid(richness~connectance, scales="free") + 
+# ggplot(guild.abundances) +
+#   geom_boxplot(aes(x = trophic.guild, y = abund)) +
+#   facet_grid(richness~connectance, scales="free") +
 #   NULL
 #############
 metrics.results <- NULL
-
-# i.richness <- 1
-# i.connectance <- 3
-# i.tl <- 3
-# i.rep <- 2
 
 for(i.richness in 1:length(richness.levels)){
   for(i.connectance in 1:length(connectance.levels)){
@@ -86,8 +81,6 @@ for(i.richness in 1:length(richness.levels)){
     }# for i.apport
   }# for i.connectance
 }# for i.richness
-
-# readr::write_delim(x = metrics.results,path = "./results/cohen_simulation_metrics_CONSTANT_DEGREE.csv",delim = ";")
 
 readr::write_delim(x = metrics.results,path = "./results/sugihara_model_metrics.csv",delim = ";")
 
