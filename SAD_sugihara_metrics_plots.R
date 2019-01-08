@@ -4,7 +4,11 @@
 
 my.palette <- c("darkgreen","#009E73","#E69F00","#D55E00")
 
-metrics.results <- readr::read_delim(file = "./results/sugihara_model_metrics.csv",delim = ";")
+# metrics.results <- readr::read_delim(file = "./results/sugihara_model_metrics_DD.csv",delim = ";")
+# metrics.results <- readr::read_delim(file = "./results/sugihara_model_metrics_DP.csv",delim = ";")
+# metrics.results <- readr::read_delim(file = "./results/sugihara_model_metrics_RF.csv",delim = ";")
+metrics.results <- readr::read_delim(file = "./results/sugihara_model_metrics_all_apportionments.csv",delim = ";")
+
 
 richness.levels <- unique(metrics.results$richness.level)
 connectance.levels <- unique(metrics.results$connectance.level)
@@ -32,6 +36,7 @@ plot.data$trophic.guild <- plyr::revalue(plot.data$trophic.guild,c("primary Prod
 metric.centroids <- plot.data %>% 
   # dplyr::filter(apportionment.level == apportionment.levels[i.apport]) %>% 
   group_by(richness.level,
+           apportionment.level,
            connectance.level,
            trophic.guild) %>% 
   summarize(centroid.skewness = mean(skewness),centroid.evenness = mean(hill.evenness))
@@ -70,6 +75,9 @@ sugihara.metrics.plot <- ggplot(plot.data,aes(x = skewness,y = hill.evenness)) +
 
 # }
 
-# tiff("./results/images/sugihara_metrics.tiff", res=600, compression = "lzw", width = 4500, height = 2000, units = "px")
+# tiff("./results/images/sugihara_metrics_DD.tiff", res=600, compression = "lzw", width = 4500, height = 2000, units = "px")
+# tiff("./results/images/sugihara_metrics_DP.tiff", res=600, compression = "lzw", width = 4500, height = 2000, units = "px")
+# tiff("./results/images/sugihara_metrics_RF.tiff", res=600, compression = "lzw", width = 4500, height = 2000, units = "px")
+
 sugihara.metrics.plot
 # dev.off()

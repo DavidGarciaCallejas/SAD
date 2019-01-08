@@ -66,8 +66,8 @@ scale.weibull <- 4.7 * 100
 
 # niche apportionment model
 # niche.apportionment <- "dominance.decay"
-# niche.apportionment <- "dominance.preemption"
-niche.apportionment <- "random.fraction"
+niche.apportionment <- "dominance.preemption"
+# niche.apportionment <- "random.fraction"
 # niche.apportionment <- "random.assortment"
 # niche.apportionment <- c("dominance.decay","dominance.preemption","random.fraction","random.assortment")
 
@@ -355,4 +355,19 @@ for(i.richness in 1:length(richness.levels)){
 }# for i.richness
 
 sim.results <- sim.results[,c("richness","connectance","niche.apport","replicate","ID","M","N_predicted","trophic.position","plant.consumer")]
-readr::write_delim(x = sim.results,path = "./results/abundances_niche_model.csv",delim = ";")
+
+my.file.name <- "abundances_niche_model"
+if("dominance.preemption" %in% niche.apportionment){
+  my.file.name <- paste(my.file.name,"_DP",sep="")
+}
+if("dominance.decay" %in% niche.apportionment){
+  my.file.name <- paste(my.file.name,"_DD",sep="")
+}
+if("random.fraction" %in% niche.apportionment){
+  my.file.name <- paste(my.file.name,"_RF",sep="")
+}
+if("random.assortment" %in% niche.apportionment){
+  my.file.name <- paste(my.file.name,"_RA",sep="")
+}
+
+readr::write_delim(x = sim.results,path = paste("./results/",my.file.name,".csv",sep=""),delim = ";")

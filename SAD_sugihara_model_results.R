@@ -2,7 +2,9 @@
 # calculate hill evenness, mad, skewness for every SAD obtained with the script "SAD_sugihara_abundances_model"
 #####################
 
-model.data <- readr::read_delim(file = "./results/abundances_niche_model_trophic_guild.csv",delim = ";")
+model.data <- readr::read_delim(file = "./results/abundances_niche_model_trophic_guild_DD.csv",delim = ";")
+# model.data <- readr::read_delim(file = "./results/abundances_niche_model_trophic_guild_DP.csv",delim = ";")
+# model.data <- readr::read_delim(file = "./results/abundances_niche_model_trophic_guild_RF.csv",delim = ";")
 
 richness.levels <- unique(model.data$richness)
 connectance.levels <- unique(model.data$connectance)
@@ -82,5 +84,7 @@ for(i.richness in 1:length(richness.levels)){
   }# for i.connectance
 }# for i.richness
 
-readr::write_delim(x = metrics.results,path = "./results/sugihara_model_metrics.csv",delim = ";")
+readr::write_delim(x = metrics.results,path = "./results/sugihara_model_metrics_DD.csv",delim = ";")
+# readr::write_delim(x = metrics.results,path = "./results/sugihara_model_metrics_DP.csv",delim = ";")
+# readr::write_delim(x = metrics.results,path = "./results/sugihara_model_metrics_RF.csv",delim = ";")
 
