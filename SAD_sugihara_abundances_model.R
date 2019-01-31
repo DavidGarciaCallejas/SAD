@@ -54,22 +54,37 @@ NicheModel <- function(S,connectance,min.primary = 1,niche = NULL){
 #####################
 # network parameters
 connectance.levels <- c(0.1,0.2,0.3)
-richness.levels <- c(50,100,200)
+richness.levels <- c(100)
 
 # basal richness, in fraction of total or in number of sp
 min.primary <- .2
 
 # basal sp abundances distribution
-shape.weibull.min <- 0.15
-shape.weibull.max <- 0.2
-scale.weibull <- 4.7 * 100
+resources.dist <- "uniform"
+
+# similar total number of individuals in the two distributions
+if(resources.dist == "skewed"){
+  shape.weibull.min <- 0.15
+  shape.weibull.max <- 0.2
+  scale.weibull <- 4.7 * 100
+}else if(resources.dist == "uniform"){
+  shape.weibull.min <- 4
+  shape.weibull.max <- 6
+  scale.weibull <- 2000*100
+}
+
+# tt <- rweibull(100,
+#          shape = runif(1,shape.weibull.min,shape.weibull.max),
+#          scale = scale.weibull)
+# plot(density(tt))
+# sum(tt)
 
 # niche apportionment model
 # niche.apportionment <- "dominance.decay"
-niche.apportionment <- "dominance.preemption"
+# niche.apportionment <- "dominance.preemption"
 # niche.apportionment <- "random.fraction"
 # niche.apportionment <- "random.assortment"
-# niche.apportionment <- c("dominance.decay","dominance.preemption","random.fraction","random.assortment")
+niche.apportionment <- c("dominance.decay","dominance.preemption","random.fraction","random.assortment")
 
 
 # other parameters
@@ -369,5 +384,8 @@ if("random.fraction" %in% niche.apportionment){
 if("random.assortment" %in% niche.apportionment){
   my.file.name <- paste(my.file.name,"_RA",sep="")
 }
+
+# resource distribution
+my.file.name <- paste(my.file.name,"_",resources.dist,sep="")
 
 readr::write_delim(x = sim.results,path = paste("./results/",my.file.name,".csv",sep=""),delim = ";")
