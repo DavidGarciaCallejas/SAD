@@ -99,8 +99,8 @@ rank.abundances.plot <- subset(rank.abundances, resource.distribution == "skewed
                             connectance == 0.2 &
                             trophic.guild != "resources")
 
-# my.palette <- c("darkgreen","#009E73","#E69F00","#D55E00")
-my.palette <- c("gray80","gray60","gray40","gray20")
+my.palette <- c("gray60","#009E73","#E69F00","#D55E00")
+# my.palette <- c("gray80","gray60","gray40","gray20")
 
 selected.rad.plot <- ggplot(rank.abundances.plot,aes(x = species.rank,y = relative.abund, group = niche.apport)) +
   
@@ -108,7 +108,7 @@ selected.rad.plot <- ggplot(rank.abundances.plot,aes(x = species.rank,y = relati
   # geom_line(aes(color = niche.apport), size = 1.1) +#(aes(linetype = site.ID)) +
   
   # geom_point(aes(fill = niche.apport),shape = 21, size = 1.5) +#(aes(shape = site.ID)) + 
-  geom_point(aes(fill = niche.apport, shape = niche.apport), size = 1.5) +#(aes(shape = site.ID)) + 
+  geom_point(aes(fill = niche.apport, shape = niche.apport), size = 2) +#(aes(shape = site.ID)) + 
   
   # facet_grid(trophic.guild~connectance+richness,scales = "free")+
   # facet_grid(fct_rev(trophic.guild)~connectance+resource.distribution,scales = "free")+
@@ -124,12 +124,13 @@ selected.rad.plot <- ggplot(rank.abundances.plot,aes(x = species.rank,y = relati
   
   xlab("species rank") + ylab("relative abundance") +
   DGC::theme_Publication()+
+  theme(legend.title=element_blank())+
   theme(strip.background = element_blank())+#,strip.text.x = element_blank()) +
   #guides(color=FALSE)+#, fill = FALSE)+
   NULL
 
-# tiff(filename = "./results/images/sugihara_RAD_c02.tiff", res=600, compression = "lzw", width = 4500, height = 3000, units = "px")
+tiff(filename = "./results/images/sugihara_RAD_c02.tiff", res=600, compression = "lzw", width = 4500, height = 3000, units = "px")
 selected.rad.plot
-# dev.off()
+dev.off()
 
-ggsave(selected.rad.plot, filename = "./results/images/sugihara_RAD_c02.pdf", device = cairo_pdf, width = 22, height = 14, units = "cm")
+# ggsave(selected.rad.plot, filename = "./results/images/sugihara_RAD_c02.pdf", device = cairo_pdf, width = 22, height = 14, units = "cm")
